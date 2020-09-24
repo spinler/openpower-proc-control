@@ -4,7 +4,7 @@ Description=Enable Open Power NMI service
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart=@bindir@/pdbg -a stop
-ExecStart=@bindir@/pdbg -a sreset
+ExecStart=@bindir@/pdbg -b sbefifo -a stop
+ExecStart=@bindir@/pdbg -b sbefifo -a sreset
 SyslogIdentifier=openpower-proc-nmi
 
