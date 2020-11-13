@@ -16,6 +16,8 @@
 
 #include "nmi_interface.hpp"
 
+#include <libpdbg.h>
+
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/elog.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
@@ -33,26 +35,46 @@ NMI::NMI(sdbusplus::bus::bus& bus, const char* path) :
 void NMI::nMI()
 {
     using namespace phosphor::logging;
-    using sdbusplus::exception::SdBusError;
     using InternalFailure =
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure;
+    struct pdbg_target *procTarget, *childTarget;
+    char path[16];
 
-    constexpr auto SYSTEMD_SERVICE = "org.freedesktop.systemd1";
-    constexpr auto SYSTEMD_OBJ_PATH = "/org/freedesktop/systemd1";
-    constexpr auto SYSTEMD_INTERFACE = "org.freedesktop.systemd1.Manager";
+    // Find and probe the right child target (PIB) before invoking
+    // stop all chip op.
+    pdbg_for_each_class_target("proc", procTarget) {
 
-    auto method = bus.new_method_call(SYSTEMD_SERVICE, SYSTEMD_OBJ_PATH,
-                                      SYSTEMD_INTERFACE, "StartUnit");
-    method.append("nmi.service", "replace");
-    try
-    {
-        bus.call_noreply(method);
+        sprintf(path,
+                "/%s%d/%s","proc", pdbg_target_index(procTarget),
+                "pib");
+
+        childTarget = pdbg_target_from_path(NULL, path);
+
+        //Bail out if child target not available.
+        if (childTarget == NULL) {
+            log<level::ERR>("No valid target found");
+            report<InternalFailure>();
+            return;
+        }
+
+        // Probe the child (pib) target
+        pdbg_target_probe(childTarget);
+
     }
-    catch (const SdBusError& e)
+
+    if (thread_stop_all() != 0)
     {
-        log<level::ALERT>("Error in starting NMI service. ");
+        log<level::ERR>("Failed to stop  all threads");
         report<InternalFailure>();
+        return;
     }
+    if (thread_sreset_all() != 0)
+    {
+        log<level::ERR>("Failed to sreset all threads");
+        report<InternalFailure>();
+        return;
+    }
+
 }
 } // namespace proc
 } // namespace openpower
