@@ -288,3 +288,7 @@ if not get_option('tests').disabled()
         )
     )
 endif
+
+if get_option('rbmc-cfam-daemon').allowed()
+  subdir('rbmc-cfam-daemon')
+endif
