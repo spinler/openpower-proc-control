@@ -32,3 +32,5 @@ option('op_dump_obj_path', type: 'string',
         value: '/org/openpower/dump',
         description : 'Object path requesting OpenPOWER dumps')
 
+option('rbmc-cfam-daemon', type: 'feature',
+       description: 'Enable the RBMC CFAM daemon')
