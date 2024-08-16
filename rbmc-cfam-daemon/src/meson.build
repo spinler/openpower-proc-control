@@ -8,6 +8,7 @@ cfam_deps = [
 
 executable('rbmc-cfamd',
     'application.cpp',
+    'cfam_fields.cpp',
     'cfam_main.cpp',
     dependencies: [
       cfam_deps
