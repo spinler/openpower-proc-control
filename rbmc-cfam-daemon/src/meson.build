@@ -10,6 +10,7 @@ cfam_deps = [
 
 sources = [
     'application.cpp',
+    'cfam_fields.cpp',
     'cfam_main.cpp',
 ]
 
