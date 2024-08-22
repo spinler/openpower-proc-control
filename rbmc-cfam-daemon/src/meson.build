@@ -10,8 +10,10 @@ cfam_deps = [
 
 sources = [
     'application.cpp',
+    'cfam_access.cpp',
     'cfam_fields.cpp',
     'cfam_main.cpp',
+    'sysfs.cpp',
 ]
 
 executable('rbmc-cfamd',
