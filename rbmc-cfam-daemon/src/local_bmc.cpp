@@ -168,3 +168,11 @@ sdbusplus::async::task<> LocalBMC::writeBMCState()
 
     co_return;
 }
+void LocalBMC::setSiblingCommsOK(bool ok)
+{
+    if (ok != siblingOK)
+    {
+        cfam.writeSiblingCommsOK(ok);
+        siblingOK = ok;
+    }
+}

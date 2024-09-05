@@ -14,6 +14,7 @@ executable('rbmc-cfamd',
     'local_bmc.cpp',
     'local_cfam.cpp',
     'sibling_cfam.cpp',
+    'sibling_bmc.cpp',
     'services.cpp',
     'sysfs.cpp',
     dependencies: [
